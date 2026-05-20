@@ -11,26 +11,7 @@ Requires-Dist: pytest>=7; extra == "dev"
 
 # flux-genome
 
-**Genetic Expression Engine for Constraint Theory**
-
-One fixed genome. Adaptive protein expression. The same rigid Tensor-Penrose DNA structure serves every domain through regulated gene expression.
-
-## Metaphor
-
-| Biology | flux-genome |
-|---------|-------------|
-| DNA | Tensor-Penrose structure (Eisenstein lattice, cyclotomic fields) |
-| Ribosome | Reads DNA, assembles constraint proteins |
-| Proteins | Executable constraint-checking procedures |
-| Gene Expression | Which proteins get built depends on environmental context |
-| Promoters/Enhancers | Genes that activate other genes |
-| Silencers | Genes that suppress others |
-| Mutation | Sediment layers modify protein structure over time |
-| Epigenetics | Expression history affects future expression |
-
-**The key insight:** The genome is FIXED. Expression is ADAPTIVE. Different environments (maritime, medical, automotive, aerospace, industrial) produce different constraint procedures from the same underlying genome.
-
-## Install
+Genetic expression engine for constraint theory — a fixed genome where different environments activate different genes, producing domain-specific constraint checkers from shared DNA.
 
 ```bash
 pip install -e .
@@ -38,13 +19,47 @@ pip install -e .
 
 Requires Python 3.9+ and numpy.
 
+## How It Works
+
+The system is built on a biological metaphor that maps surprisingly well to constraint engineering:
+
+| Biology | flux-genome |
+|---------|-------------|
+| DNA | Tensor-Penrose structure (Eisenstein lattice, cyclotomic fields) |
+| Ribosome | Reads DNA, assembles constraint-checking procedures |
+| Proteins | Executable constraint checkers |
+| Gene expression | Which proteins get built depends on environment |
+| Promoters | Genes that activate other genes |
+| Silencers | Genes that suppress others |
+| Mutation | Sediment layers modify protein structure over time |
+
+The critical insight: **the genome is FIXED, expression is ADAPTIVE**. The same 25-gene genome contains checkers for maritime, medical, automotive, aerospace, and industrial domains. The environment determines which genes activate. A maritime deployment produces completely different constraint procedures than a medical one — from the same DNA.
+
+### The Expression Pipeline
+
+```
+Genome (25 genes, fixed)
+  ↓ Ribosome reads it
+Transcript Profile (which genes are active in this environment)
+  ↓ Ribosome translates
+Proteins (executable constraint checkers)
+  ↓ Incubator runs them against data
+Results (violations, active genes, expression levels)
+```
+
+Promoters and silencers create gene-gene interactions: activating a `safety_critical` gene might promote regulatory genes (SOLAS, ISO-26262) that would otherwise stay dormant.
+
+## What This Module Does
+
+It provides a fixed 25-gene constraint genome across 5 domains, plus the machinery to express domain-specific constraint checkers from that genome. You describe your environment (domain, regulatory requirements) and the system activates the right genes, builds the right proteins, and checks your data.
+
 ## Quick Start
 
 ```python
 import numpy as np
 from flux_genome import constraint_genome, Incubator
 
-# Get the built-in constraint genome (25 genes, 5 domains)
+# Get the built-in genome (25 genes, 5 domains)
 genome = constraint_genome()
 
 # Express constraint proteins for a maritime environment
@@ -53,11 +68,11 @@ data = np.random.randn(10, 8)  # your sensor data
 
 result = incubator.express({"domain": "maritime", "regulatory": True}, data)
 
-# Check which genes activated
+# Which genes activated?
 print(result["profile"].active_genes)
 print(result["profile"].strongly_expressed)
 
-# Get constraint violation results
+# Violation results
 for protein_id, info in result["results"].items():
     print(f"{protein_id}: {info['violations']} violations")
 ```
@@ -83,7 +98,7 @@ gene = Gene(
 
 ### Genome
 
-The complete Tensor-Penrose DNA — fixed, contains all possible proteins:
+The complete DNA — fixed, contains all possible proteins:
 
 ```python
 from flux_genome import Genome
@@ -95,7 +110,7 @@ print(genome.gene_count, genome.domains)
 
 ### Ribosome
 
-Reads the genome and assembles proteins:
+Reads the genome and builds proteins:
 
 ```python
 from flux_genome import Ribosome
@@ -107,7 +122,7 @@ proteins = ribosome.translate_profile(genome, profile)
 
 ### Incubator
 
-The full expression pipeline — genome + environment → proteins → results:
+The full pipeline — genome + environment → proteins → results:
 
 ```python
 from flux_genome import Incubator
@@ -116,43 +131,55 @@ incubator = Incubator(genome)
 result = incubator.express(environment, data)
 ```
 
-### Built-in Checkers
+## Built-in Checkers
 
-The `builtins` module provides 20 constraint checker factories:
+20 constraint checker factories in the `builtins` module:
 
-- `make_range_check(lo, hi)` — bounds checking
-- `make_threshold_check(threshold, mode)` — above/below threshold
-- `make_variance_check(max_var)` — variance limit
-- `make_monotonic_check()` — monotonicity
-- `make_symmetry_check()` — spatial symmetry
-- `make_bounded_deriv_check(max_deriv)` — rate of change
-- `make_integral_check(max_integral)` — cumulative bound
-- `make_orthogonality_check(min_dot)` — vector orthogonality
-- `make_noise_floor_check(floor)` — minimum signal level
-- `make_latency_check(max_latency)` — settling time
-- `make_redundancy_check(min_overlap)` — redundancy minimum
-- `make_emission_check(max_level)` — emission ceiling
-- `make_corrosion_check(max_rate)` — degradation rate
-- `make_stability_check(max_drift)` — long-term drift
-- `make_spatial_check(max_gradient)` — spatial gradient
-- `make_compatibility_check(standard)` — DO-178C, ISO-26262, IEC-62304, SOLAS, IEC-61511
-- `make_throughput_check(min_rate)` — minimum throughput
-- `make_spectral_check(max_peak)` — spectral purity
-- `make_fault_tolerance_check(min_survivors)` — fault tolerance
+| Checker | What it checks |
+|---------|---------------|
+| `make_range_check(lo, hi)` | Bounds |
+| `make_threshold_check(threshold, mode)` | Above/below threshold |
+| `make_variance_check(max_var)` | Variance limit |
+| `make_monotonic_check()` | Monotonicity |
+| `make_symmetry_check()` | Spatial symmetry |
+| `make_bounded_deriv_check(max_deriv)` | Rate of change |
+| `make_integral_check(max_integral)` | Cumulative bound |
+| `make_orthogonality_check(min_dot)` | Vector orthogonality |
+| `make_noise_floor_check(floor)` | Minimum signal |
+| `make_latency_check(max_latency)` | Settling time |
+| `make_redundancy_check(min_overlap)` | Redundancy minimum |
+| `make_emission_check(max_level)` | Emission ceiling |
+| `make_corrosion_check(max_rate)` | Degradation rate |
+| `make_stability_check(max_drift)` | Long-term drift |
+| `make_spatial_check(max_gradient)` | Spatial gradient |
+| `make_compatibility_check(standard)` | DO-178C, ISO-26262, IEC-62304, SOLAS, IEC-61511 |
+| `make_throughput_check(min_rate)` | Minimum throughput |
+| `make_spectral_check(max_peak)` | Spectral purity |
+| `make_fault_tolerance_check(min_survivors)` | Fault tolerance |
 
-## Built-in Genome
+## The Built-in Genome
 
-`constraint_genome()` returns a genome with 25 genes across 5 domains:
+`constraint_genome()` returns 25 genes across 5 domains:
 
-- **Maritime** (5): nav_position, nav_heading, nav_stability, solas_compliance, wave_response
-- **Medical** (5): patient_vitals, drug_dosage, alarms, iec62304, contamination
-- **Automotive** (5): speed_limit, brake_distance, iso26262, latency_auto, redundancy_auto
-- **Aerospace** (5): altitude, g_force, do178c, spectral_purity, fault_tolerance
-- **Industrial** (5): temperature, emissions, corrosion, throughput, iec61511
+| Domain | Genes |
+|--------|-------|
+| **Maritime** (5) | nav_position, nav_heading, nav_stability, solas_compliance, wave_response |
+| **Medical** (5) | patient_vitals, drug_dosage, alarms, iec62304, contamination |
+| **Automotive** (5) | speed_limit, brake_distance, iso26262, latency_auto, redundancy_auto |
+| **Aerospace** (5) | altitude, g_force, do178c, spectral_purity, fault_tolerance |
+| **Industrial** (5) | temperature, emissions, corrosion, throughput, iec61511 |
 
 Each domain's genes only activate when the environment matches. Regulatory genes (SOLAS, ISO-26262, DO-178C, etc.) require both domain match AND `regulatory=True`.
 
-## Testing
+## Where to Go Next
+
+| If you want... | Go to |
+|----------------|-------|
+| The unified library | [flux-lib](../flux-lib-py) |
+| CLI constraint checking | [flux-check](../flux-check-py) |
+| Hyperbolic model routing | [flux-hyperbolic](../flux-hyperbolic-py) |
+
+## Development
 
 ```bash
 pip install -e ".[dev]"
