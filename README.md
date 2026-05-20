@@ -1,8 +1,6 @@
 # flux-genome
 
-**Genetic Expression Engine for Constraint Theory**
-
-One fixed genome. Adaptive protein expression. The same DNA serves every domain — different environments activate different genes.
+Genetic expression engine for constraint theory — a fixed genome where different environments activate different genes, producing domain-specific constraint checkers from shared DNA.
 
 ```bash
 pip install -e .
